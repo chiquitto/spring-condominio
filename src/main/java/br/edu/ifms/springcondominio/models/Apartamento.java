@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "TB_APARTAMENTO")
-public class ApartamentoModel implements Serializable {
+public class Apartamento implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -83,7 +83,5 @@ public class ApartamentoModel implements Serializable {
 	public void setDataCadastro(LocalDateTime dataCadastro) {
 		this.dataCadastro = dataCadastro;
 	}
-
-	
 
 }

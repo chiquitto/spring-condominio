@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.ifms.springcondominio.dtos.ApartamentoDto;
-import br.edu.ifms.springcondominio.models.ApartamentoModel;
+import br.edu.ifms.springcondominio.models.Apartamento;
 import br.edu.ifms.springcondominio.services.ApartamentoService;
 import jakarta.validation.Valid;
 
@@ -46,7 +46,7 @@ public class ApartamentoController {
 					.body( "Conflito: O resposável já existe para outro apartamento" );
 		}
 		
-		var apartamentoModel = new ApartamentoModel();
+		var apartamentoModel = new Apartamento();
 		BeanUtils.copyProperties(apartamentoDto, apartamentoModel);
 		apartamentoModel.setDataCadastro( LocalDateTime.now(ZoneId.of("UTC")) );
 		
@@ -55,14 +55,14 @@ public class ApartamentoController {
 	}
 	
 	@GetMapping
-	public ResponseEntity< List<ApartamentoModel> > pegarTodos() {
+	public ResponseEntity< List<Apartamento> > pegarTodos() {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body( apartamentoService.findAll() );
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> pegarUm( @PathVariable(value = "id") UUID id ) {
-		Optional<ApartamentoModel> apartamentoOptional = apartamentoService.findById( id );
+		Optional<Apartamento> apartamentoOptional = apartamentoService.findById( id );
 		if (!apartamentoOptional.isPresent()) {
 			return ResponseEntity.status( HttpStatus.NOT_FOUND )
 					.body( "Erro: O apartamento não existe" );
@@ -73,7 +73,7 @@ public class ApartamentoController {
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> apagarApartamento( @PathVariable(value = "id") UUID id ) {
-		Optional<ApartamentoModel> apartamentoOptional = apartamentoService.findById( id );
+		Optional<Apartamento> apartamentoOptional = apartamentoService.findById( id );
 		if (!apartamentoOptional.isPresent()) {
 			return ResponseEntity.status( HttpStatus.NOT_FOUND )
 					.body( "Erro: O apartamento não existe" );
@@ -86,7 +86,7 @@ public class ApartamentoController {
 	@PutMapping("/{id}")
 	public ResponseEntity<Object> atualizarApartamento( @PathVariable(value = "id") UUID id,
 			@RequestBody @Valid ApartamentoDto apartamentoDto) {
-		Optional<ApartamentoModel> apartamentoOptional = apartamentoService.findById( id );
+		Optional<Apartamento> apartamentoOptional = apartamentoService.findById( id );
 		if (!apartamentoOptional.isPresent()) {
 			return ResponseEntity.status( HttpStatus.NOT_FOUND )
 					.body( "Erro: O apartamento não existe" );

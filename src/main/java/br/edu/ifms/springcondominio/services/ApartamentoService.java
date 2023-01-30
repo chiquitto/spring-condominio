@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import br.edu.ifms.springcondominio.models.ApartamentoModel;
+import br.edu.ifms.springcondominio.models.Apartamento;
 import br.edu.ifms.springcondominio.repositories.ApartamentoRepository;
 import jakarta.transaction.Transactional;
 
@@ -20,7 +20,7 @@ public class ApartamentoService {
 	}
 
 	@Transactional
-	public ApartamentoModel save(ApartamentoModel apartamentoModel) {
+	public Apartamento save(Apartamento apartamentoModel) {
 		return apartamentoRepository.save(apartamentoModel);
 	}
 
@@ -32,16 +32,16 @@ public class ApartamentoService {
 		return apartamentoRepository.existsByResponsavel(responsavel);
 	}
 
-	public List<ApartamentoModel> findAll() {
+	public List<Apartamento> findAll() {
 		return apartamentoRepository.findAll();
 	}
 
-	public Optional<ApartamentoModel> findById(UUID id) {
+	public Optional<Apartamento> findById(UUID id) {
 		return apartamentoRepository.findById(id);
 	}
 
 	@Transactional
-	public void delete(ApartamentoModel apartamentoModel) {
+	public void delete(Apartamento apartamentoModel) {
 		apartamentoRepository.delete(apartamentoModel);
 	}
 

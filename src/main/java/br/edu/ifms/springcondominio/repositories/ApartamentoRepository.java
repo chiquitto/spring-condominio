@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import br.edu.ifms.springcondominio.models.ApartamentoModel;
+import br.edu.ifms.springcondominio.models.Apartamento;
 
 /**
  * 
@@ -15,7 +15,7 @@ import br.edu.ifms.springcondominio.models.ApartamentoModel;
  *
  */
 @Repository
-public interface ApartamentoRepository extends JpaRepository<ApartamentoModel, UUID> {
+public interface ApartamentoRepository extends JpaRepository<Apartamento, UUID> {
 
 	boolean existsByNumeroAndBloco(String numero, String bloco);
 	boolean existsByResponsavel(String responsavel);
