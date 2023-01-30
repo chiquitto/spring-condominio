@@ -2,13 +2,18 @@ package br.edu.ifms.springcondominio.models;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -35,6 +40,10 @@ public class Apartamento implements Serializable {
 	
 	@Column(nullable = false)
 	private LocalDateTime dataCadastro;
+	
+	@OneToMany(mappedBy = "apartamento")
+	@JsonIgnore
+	private List<Vaga> vagas = new ArrayList<>();
 
 	public UUID getId() {
 		return id;
@@ -82,6 +91,14 @@ public class Apartamento implements Serializable {
 
 	public void setDataCadastro(LocalDateTime dataCadastro) {
 		this.dataCadastro = dataCadastro;
+	}
+
+	public List<Vaga> getVagas() {
+		return vagas;
+	}
+
+	public void setVagas(List<Vaga> vagas) {
+		this.vagas = vagas;
 	}
 
 }
