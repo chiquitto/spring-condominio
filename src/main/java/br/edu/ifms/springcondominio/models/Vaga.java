@@ -2,6 +2,8 @@ package br.edu.ifms.springcondominio.models;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
@@ -13,6 +15,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -36,6 +40,13 @@ private static final long serialVersionUID = 1L;
 	@JoinColumn(name = "id_apto")
 	@JsonIncludeProperties(value = {"id"})
 	private Apartamento apartamento;
+	
+	@ManyToMany
+	@JoinTable(name = "TB_VAGA_VEICULO",
+				joinColumns = @JoinColumn(name = "id_vaga"),
+				inverseJoinColumns = @JoinColumn(name = "id_veiculo"))
+	@JsonIncludeProperties(value = {"id"})
+	Set<Veiculo> veiculos = new HashSet<>();
 
 	public UUID getId() {
 		return id;
@@ -67,6 +78,10 @@ private static final long serialVersionUID = 1L;
 
 	public void setApartamento(Apartamento apartamento) {
 		this.apartamento = apartamento;
+	}
+
+	public Set<Veiculo> getVeiculos() {
+		return veiculos;
 	}
 	
 }
