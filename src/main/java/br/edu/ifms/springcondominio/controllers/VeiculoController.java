@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.edu.ifms.springcondominio.dtos.VeiculoDto;
 import br.edu.ifms.springcondominio.models.Veiculo;
@@ -40,8 +41,7 @@ public class VeiculoController {
 	public ResponseEntity<Object> novoVeiculo( @RequestBody @Valid VeiculoDto veiculoDto ) {
 		
 		if ( veiculoService.existsByPlaca( veiculoDto.getPlaca() ) ) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body( "Erro: A placa já existe para outro veiculo" );
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "A placa já existe para outro veiculo");
 		}
 		
 		var veiculo = new Veiculo();
@@ -62,30 +62,29 @@ public class VeiculoController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> pegarUm( @PathVariable(name = "id") UUID id ) {
+		Veiculo veiculo = testExistsById(id);
+		
+		return ResponseEntity.status( HttpStatus.OK )
+				.body( veiculo );
+	}
+
+	private Veiculo testExistsById(UUID id) {
 		Optional<Veiculo> veiculoOptional = veiculoService.findById( id );
 		if (veiculoOptional.isEmpty()) {
-			return ResponseEntity.status( HttpStatus.NOT_FOUND )
-					.body( "Erro: O veiculo não existe" );
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "O veiculo não existe");
 		}
-		return ResponseEntity.status( HttpStatus.OK )
-				.body( veiculoOptional.get() );
+		return veiculoOptional.get();
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<Object> atualizarVeiculo( @PathVariable(name = "id") UUID id,
 			@RequestBody @Valid VeiculoDto veiculoDto) {
-		Optional<Veiculo> veiculoOptional = veiculoService.findById(id);
-		if (veiculoOptional.isEmpty()) {
-			return ResponseEntity.status( HttpStatus.NOT_FOUND )
-					.body( "Erro: O veiculo não existe" );
-		}
+		Veiculo veiculo = testExistsById(id);
 		
 		if ( veiculoService.existsByIdNotAndPlaca(id, veiculoDto.getPlaca()) ) {
-			return ResponseEntity.status( HttpStatus.NOT_FOUND )
-					.body( "Erro" );
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "A placa já existe para outro veiculo");
 		}
 		
-		Veiculo veiculo = veiculoOptional.get();
 		veiculo.setPlaca( veiculoDto.getPlaca() );
 		veiculo.setDescricao( veiculoDto.getDescricao() );
 		veiculoService.save( veiculo );
@@ -96,13 +95,9 @@ public class VeiculoController {
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> apagarVeiculo( @PathVariable(name = "id") UUID id ) {
-		Optional<Veiculo> veiculoOptional = veiculoService.findById(id);
-		if (veiculoOptional.isEmpty()) {
-			return ResponseEntity.status( HttpStatus.NOT_FOUND )
-					.body( "Erro: O veiculo não existe" );
-		}
+		Veiculo veiculo = testExistsById(id);
 		
-		veiculoService.delete( veiculoOptional.get() );
+		veiculoService.delete( veiculo );
 		
 		return ResponseEntity.status(HttpStatus.OK)
 				.body( "Veiculo apagado" );

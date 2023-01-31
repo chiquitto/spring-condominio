@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.edu.ifms.springcondominio.dtos.VagaVeiculoDto;
 import br.edu.ifms.springcondominio.models.Vaga;
@@ -39,14 +39,12 @@ public class VagaVeiculoController {
 	public ResponseEntity<Object> adicionarVagaVeiculo( @RequestBody @Valid VagaVeiculoDto vagaVeiculoDto ) {
 		Optional<Vaga> vagaOptional = vagaService.findById( vagaVeiculoDto.getVaga().getId() );
 		if (vagaOptional.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body( "Erro: Vaga inexistente" );
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A vaga não existe");
 		}
 		
 		Optional<Veiculo> veiculoOptional = veiculoService.findById( vagaVeiculoDto.getVeiculo().getId() );
 		if (veiculoOptional.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body( "Erro: Veiculo inexistente" );
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "O veiculo não existe");
 		}
 		
 		Vaga vaga = vagaOptional.get();
@@ -66,8 +64,7 @@ public class VagaVeiculoController {
 			) {
 		Optional<Vaga> vagaOptional = vagaService.findById( idvaga );
 		if (vagaOptional.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body( "Erro: Vaga inexistente" );
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A vaga não existe");
 		}
 		
 		Vaga vaga = vagaOptional.get();
@@ -84,8 +81,7 @@ public class VagaVeiculoController {
 			}
 		}
 		
-		return ResponseEntity.status(HttpStatus.CONFLICT)
-				.body( "Erro: Veiculo não encontrado na vaga" );
+		throw new ResponseStatusException(HttpStatus.CONFLICT, "Veiculo não encontrado na vaga");
 	}
 	
 }

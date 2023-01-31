@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.edu.ifms.springcondominio.dtos.ApartamentoDto;
 import br.edu.ifms.springcondominio.dtos.VagaDto;
@@ -44,8 +45,7 @@ public class VagaController {
 	@PostMapping
 	public ResponseEntity<Object> novaVaga(@RequestBody @Valid VagaDto vagaDto) {
 		if (vagaService.existsByNumero( vagaDto.getNumero() )) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body( "Conflito: O numero já existe para outra vaga" );
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "O numero já existe para outra vaga");
 		}
 		
 		var vagaModel = new Vaga();
@@ -74,24 +74,24 @@ public class VagaController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> pegarUm( @PathVariable(value = "id") UUID id ) {
+		Vaga vaga = testExistsById(id);
+		return ResponseEntity.status(HttpStatus.OK)
+				.body( vaga );
+	}
+
+	private Vaga testExistsById(UUID id) {
 		Optional<Vaga> vagaOptional = vagaService.findById( id );
 		if (!vagaOptional.isPresent()) {
-			return ResponseEntity.status( HttpStatus.NOT_FOUND )
-					.body( "Erro: A vaga não existe" );
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A vaga não existe");
 		}
-		return ResponseEntity.status(HttpStatus.OK)
-				.body( vagaOptional.get() );
+		return vagaOptional.get();
 	}
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Object> apagarVaga( @PathVariable(value = "id") UUID id ) {
-		Optional<Vaga> vagaOptional = vagaService.findById( id );
-		if (!vagaOptional.isPresent()) {
-			return ResponseEntity.status( HttpStatus.NOT_FOUND )
-					.body( "Erro: A vaga não existe" );
-		}
+		Vaga vaga = testExistsById(id);
 		
-		vagaService.delete( vagaOptional.get() );
+		vagaService.delete( vaga );
 		
 		return ResponseEntity.status(HttpStatus.OK)
 				.body( "A vaga foi apagada" );
@@ -100,19 +100,14 @@ public class VagaController {
 	@PutMapping("/{id}")
 	public ResponseEntity<Object> atualizarVaga( @PathVariable(value = "id") UUID id,
 			@RequestBody @Valid VagaDto vagaDto) {
-		Optional<Vaga> vagaOptional = vagaService.findById( id );
-		if (!vagaOptional.isPresent()) {
-			return ResponseEntity.status( HttpStatus.NOT_FOUND )
-					.body( "Erro: A vaga não existe" );
-		}
 		
-		Vaga vagaModel = vagaOptional.get();
-		vagaModel.setNumero( vagaDto.getNumero() );
+		Vaga vaga = testExistsById(id);
+		vaga.setNumero( vagaDto.getNumero() );
 		
-		vagaService.save(vagaModel);
+		vagaService.save(vaga);
 		
 		return ResponseEntity.ok()
-				.body( vagaModel );
+				.body( vaga );
 	}
 
 }
